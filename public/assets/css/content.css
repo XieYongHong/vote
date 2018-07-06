@@ -1,0 +1,60 @@
+/* 文章详情投票页样式 */
+
+.index_btn{
+    color: #f56c6c;
+    display: block;
+    margin-top: 20px;
+}
+.pcontent_box{
+    border: 1px solid #aaa;
+    padding: 20px;
+    margin-top: 20px;
+}
+.pcontent_box .title{
+    font-size: 20px;
+    font-weight: 500px;
+    width: 80%;
+    margin: 0 auto 20px;
+}
+.pcontent_box .writer,.pcontent_box .time{
+    font-size: 14px;
+}
+.pcontent_box .time{
+    margin-bottom: 20px;
+    color: #aaa;
+}
+.pcontent_box .content_box p{
+    margin-top: 10px;
+    text-indent: 2em;
+    text-align: left;
+}
+.pcontent_box img{
+    max-width: 100%;
+    margin-top: 20px;
+}
+/* 投票框 */
+.vote_box{
+    margin-top: 20px;
+    padding: 20px;
+}
+.vote_box .title,.ticket_box .title{
+    margin-bottom: 20px;
+    color: #f56c6c;
+}
+.ticket_box{
+    display: none;
+}
+.vote_box form{
+    max-width: 300px;
+    margin: 0 auto;
+}
+.vote_box .up_btn{
+    background: #f56c6c;
+    color: #fff;
+    width: 50%;
+    padding: 0 10px;
+    line-height: 30px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 20px auto 0;
+}
