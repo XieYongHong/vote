@@ -222,7 +222,6 @@ function addArticle(a_data){//添加文章
                     id:a_data.id,
                     name:a_data.name,
                     author:a_data.author,
-                    content:a_data.content,
                     writing:0,
                     gut:0,
                     feelings:0
@@ -251,7 +250,6 @@ function editArticle(a_data){
                     if(_data[i].id == id){
                         _data[i].name = a_data.name
                         _data[i].author = a_data.author
-                        _data[i].content = a_data.content
                     }
                 }
                 let str = '{ "data":'+JSON.stringify(_data)+'}'
