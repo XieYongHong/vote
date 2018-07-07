@@ -10,9 +10,12 @@ function upup(id) {
       id: id,
       contentType: "application/json;charset=utf-8",
       type: type
+      // writing  文笔
+      // gut  剧情
+      // feelings  情怀
     },
     success: function (data) {
-      if (data.success) {
+      if (data.success == true) {
         $(".vote_box").css("display", "none");
         $(".ticket_box").css("display", "block");
         list(id);
@@ -34,10 +37,10 @@ function list(id) {
       id: id
     },
     success: function (data) {
-      if (data.success) {
-        var writing = data.data.writing;
-        var gut = data.data.gut;
-        var feelings = data.data.feelings;
+      if (data.success == true) {
+        var writing = data.writing;
+        var gut = data.gut;
+        var feelings = data.feelings;
         $(".ticket_box .writing span").html(writing);
         $(".ticket_box .gut span").html(gut);
         $(".ticket_box .feelings span").html(feelings);

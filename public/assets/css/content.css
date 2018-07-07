@@ -28,6 +28,9 @@
     text-indent: 2em;
     text-align: left;
 }
+.pcontent_box .content_box .martop_20{
+    margin-top: 20px;
+}
 .pcontent_box img{
     max-width: 100%;
     margin-top: 20px;

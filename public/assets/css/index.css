@@ -100,3 +100,22 @@
     padding: 20px;
     user-select: text;
 }
+/* 排行榜 */
+#list{
+    font-size: 14px;
+}
+#list .am-tabs-bd ul li{
+    width: 500px;
+    margin: 10px auto;
+}
+#list .am-tabs-bd .text{
+    float: left;
+}
+#list .am-tabs-bd .num{
+    float: right;
+}
+@media screen and (max-width: 641px) {
+    #list .am-tabs-bd ul li{
+        width: 100%;
+    }
+}
