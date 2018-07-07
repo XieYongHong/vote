@@ -29,17 +29,18 @@ app.post('/getTicketNumbers',function(req,res){//查询票数
         const gen = async function(){
             let b_data = await queryBook(data.id);
             if(b_data){
-                _obj = restData('200','查询成功',false,b_data);
+                _obj = restData('200','查询成功',true,b_data);
             }else{
                 _obj = restData('203','查询失败',false);
             }
+            console.log(_obj);
             res.writeHead(200, {'Content-Type': 'application/json; charset=utf8'});
             res.end(JSON.stringify(_obj));
         }
         gen()
     })
 })
-app.get('/getTicketNumbersAll',function(req,res){//查询所有票数
+app.get('/getTicketNumbersAll',function(req,res){//查询所有文章
         const gen = async function(){
             let b_data = await queryBook();
             if(b_data){
@@ -66,6 +67,27 @@ app.post('/addArticle',(req,res) => {//添加文章
                 _obj = restData('200','添加成功',true);
             }else{
                 _obj = restData('203','添加失败',false);
+            }
+            res.writeHead(200, {'Content-Type': 'application/json; charset=utf8'});
+            res.end(JSON.stringify(_obj));
+        }
+        gen()
+    })
+})
+
+app.post('/editArticle',(req,res) => {//编辑文章
+    var body = ''
+    req.on('data', chunk => {
+        body += chunk;
+    })
+    req.on('end',() => {
+        let data = qs.parse(body);
+        const gen = async function(){
+            let type = await editArticle(data);
+            if(type){
+                _obj = restData('200','编辑成功',true);
+            }else{
+                _obj = restData('203','编辑失败',false);
             }
             res.writeHead(200, {'Content-Type': 'application/json; charset=utf8'});
             res.end(JSON.stringify(_obj));
@@ -124,7 +146,6 @@ function hasMac(mac){//判断是否mac重复
             if(err){
     
             }else{
-                console.log(data);
                 let ipData = JSON.parse(data);
                 if(ipData.data.length == 0) {     
                     addMac(mac);
@@ -181,7 +202,6 @@ function addVote(id,type){//投票
                 let str = '{ "data":'+JSON.stringify(_data)+'}'
                 fs.writeFile(book_url,str, (err) => {
                     if(err){
-                        console.log(err);
                         resolve(false)
                     }else{
                         resolve(true)
@@ -202,11 +222,38 @@ function addArticle(a_data){//添加文章
                     id:a_data.id,
                     name:a_data.name,
                     author:a_data.author,
+                    content:a_data.content,
                     writing:0,
                     gut:0,
                     feelings:0
                 }
                 _data.push(obj)
+                let str = '{ "data":'+JSON.stringify(_data)+'}'
+                fs.writeFile(book_url,str, (err) => {
+                    if(err){
+                        resolve(false)
+                    }else{
+                        resolve(true)
+                    }
+                })  
+            }
+        })
+    })
+}
+function editArticle(a_data){
+    return new Promise((resolve,reject) => {
+        fs.readFile(book_url, (err,data) => {
+            if(!err){
+                let datas = JSON.parse(data);
+                let _data = datas.data;
+                const id = a_data.id;
+                for(let i=0;i<_data.length;i++){
+                    if(_data[i].id == id){
+                        _data[i].name = a_data.name
+                        _data[i].author = a_data.author
+                        _data[i].content = a_data.content
+                    }
+                }
                 let str = '{ "data":'+JSON.stringify(_data)+'}'
                 fs.writeFile(book_url,str, (err) => {
                     if(err){
@@ -299,7 +346,7 @@ function setTimeOut(){//设置每天0点0分0秒执行
 }
 
 function cleanMac(){//清除ip.json的数据
-    var str = '{data:[]}'
+    var str = '{"data":[]}'
     fs.writeFile(ip_url,str, (err) => {
         if(err){
             console.log(err);

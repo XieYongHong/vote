@@ -8,6 +8,7 @@ function upup(id) {
     data: {
       mac: mac,
       id: id,
+      contentType: "application/json;charset=utf-8",
       type: type
     },
     success: function (data) {
