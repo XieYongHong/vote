@@ -7,20 +7,22 @@ const uuid = require('node-uuid')
 const sha256 = require('js-sha256')
 
 router.post('/vote',(req,res) => {
-    const data = req.body
-    var ip = req.headers['x-real-ip'] ||
-    req.headers['x-forwarded-for'] ||
-    req.socket.remoteAddress || '';
-    if(ip.split(':').length>0){
-        ip = ip.split(':')[3]
-    }
-    console.log(ip);
     const vote = async () => {
+        const data = req.body
+        var ip = req.headers['x-real-ip'] ||
+        req.headers['x-forwarded-for'] ||
+        req.socket.remoteAddress || '';
+        if(ip.split(':').length>0){
+            ip = ip.split(':')[3]
+        }
+        console.log(ip);
+        ip = '192.168.9.11'
         let sessionType
         let resMsg = {}
+        console.log(data.session);
         if(data.session){//验证session
             sessionType = await querys(`select ip,sha,update_time from IP where sha='${data.session}'`)
-            if(sessionType){
+            if(sessionType.length){
                 //验证投票时间
                 let vTime = sessionType[0].update_time.substring(0,10)
                 let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
@@ -45,18 +47,19 @@ router.post('/vote',(req,res) => {
             }
         }else{
             var ipType = await querys(`select ip,sha,update_time from IP where ip='${ip}'`)
-                if(ipType){
-                    let vTime = ipType[0].update_time.substring(0,10)
+            console.log(ipType);
+                if(ipType.length){
+                    let vTime = ipType[0].update_time
                     let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
-                    if(vTime == nTime){
+                    if(vTime.substring(0,10) == nTime){
                         resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',null)
                     }else{
-                        await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${id}`,(data,err) => {
+                        await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
                             if(err){
                                 resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
                             }else{
                                 const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
-                                var up = querys(`update IP set updateTime=${time} where ip='${ip}'`)
+                                var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                                 if(up){
                                     var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
                                     resMsg = comm.reMsg(true,'投票成功',voteDate)
@@ -65,7 +68,7 @@ router.post('/vote',(req,res) => {
                         })
                     }
                 }else{//第一次投票
-                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${id}`,(data,err) => {
+                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
                         if(err){
                             resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
                         }else{
