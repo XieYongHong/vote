@@ -8,7 +8,7 @@ router.post('/add',(req ,res) => {//增加短文
     const data = req.body;
     const nowTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
     mysql.query(`insert into BOOK (name,author,state,create_time,submission_time,content,img_url,type,text) 
-            values ('${data.name}','${data.author}',0,'${nowTime}','${data.time}','${data.content}','${data.img}',${data.type},${text})`, (row,err) => {
+            values ('${data.name}','${data.author}',0,'${nowTime}','${data.time}','${data.content}','/images/${data.img}',${data.type},${text})`, (row,err) => {
                 let resMsg = {}
                 if(err){
                     resMsg = comm.reMsg(false,'保存失败',null)
@@ -62,7 +62,7 @@ router.get('/list/:type',(req,res) => {
 
 router.get('/info/:id',(req,res) => {
     const id = req.params.id
-    mysql.query(`select a.name,a.author,a.submission_time,a.img_url,a.content,b.click,b.vote from BOOK as a, VOTE as b where a.id='${id}' and b.book_id='${id}'`, (data,err) => {
+    mysql.query(`select a.name,a.author,a.submission_time,a.img_url,a.content,a.type,b.click,b.vote from BOOK as a, VOTE as b where a.id='${id}' and b.book_id='${id}'`, (data,err) => {
         let resMsg = {}
         if(err){
             resMsg = comm.reMsg(false,'查询失败',null)
