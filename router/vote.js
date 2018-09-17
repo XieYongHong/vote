@@ -24,7 +24,8 @@ router.post('/vote',(req,res) => {
                 let vTime = sessionType[0].update_time.substring(0,10)
                 let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
                 if(vTime == nTime){
-                    resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',null)
+                    var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
+                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:voteDate[0].vote})
                 }else{
                     await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id='${id}'`,(data,err) => {
                         if(err){
@@ -50,7 +51,8 @@ router.post('/vote',(req,res) => {
                     let vTime2 = SDT.format(new Date(vTime),'YYYY-MM-DD HH:mm:ss').substring(0,10)
                     let ipUUID = ipType[0].sha
                     if(vTime2 == nTime){
-                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',null)
+                        var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
+                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:voteDate[0].vote})
                     }else{
                         await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
                             if(err){
