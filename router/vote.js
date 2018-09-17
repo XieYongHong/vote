@@ -15,6 +15,7 @@ router.post('/vote',(req,res) => {
         if(ip.split(':').length>0){
             ip = ip.split(':')[3]
         }
+        
         let sessionType
         let resMsg = {}
         if(data.session){//验证session
@@ -24,24 +25,30 @@ router.post('/vote',(req,res) => {
                 let vTime = sessionType[0].update_time.substring(0,10)
                 let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
                 if(vTime == nTime){
-                    var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:voteDate})
+                    await mysql.query(`select vote from VOTE where book_id=${data.id}`,(data,err) => {
+                        var num = data[0].vote
+                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:num})
+                        res.send(resMsg)
+                    })
                 }else{
-                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id='${id}'`,(data,err) => {
+                    mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id='${id}'`,(data,err) => {
                         if(err){
                             resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
+                            res.send(resMsg)
                         }else{
                             const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
                             var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                             if(up){
                                 var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
                                 resMsg = comm.reMsg(true,'投票成功',{vote:voteDate})
+                                res.send(resMsg)
                             }
                         }
                     })
                 }
             }else{
                 resMsg = comm.reMsg(false,'投票失败,请联系墙君 code:010',null)
+                res.send(resMsg)
             }
         }else{
             var ipType = await querys(`select ip,sha,update_time from IP where ip='${ip}'`)
@@ -51,20 +58,23 @@ router.post('/vote',(req,res) => {
                     let vTime2 = SDT.format(new Date(vTime),'YYYY-MM-DD HH:mm:ss').substring(0,10)
                     let ipUUID = ipType[0].sha
                     if(vTime2 == nTime){
-                        var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                        	console.log(voteDate)
-			resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:voteDate})
+                        mysql.query(`select vote from VOTE where book_id=${data.id}`,(data,err) => {
+                            var num = data[0].vote
+                            resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:num})
+                            res.send(resMsg)
+                        })
                     }else{
                         await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
                             if(err){
                                 resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
+                                res.send(resMsg)
                             }else{
                                 const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
                                 var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                                 if(up){
                                     var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-					console.log(voteDate)
                                     resMsg = comm.reMsg(true,'投票成功',{vote:voteDate})
+                                    res.send(resMsg)
                                 }
                             }
                         })
@@ -73,6 +83,7 @@ router.post('/vote',(req,res) => {
                     await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
                         if(err){
                             resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
+                            res.send(resMsg)
                         }else{
                             const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
                             const uuids = uuid.v4()
@@ -82,12 +93,13 @@ router.post('/vote',(req,res) => {
                             if(up){
                                 var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
                                 resMsg = comm.reMsg(true,'投票成功',{vote:voteDate,session:ipUUID})
+                                res.send(resMsg)
                             }
                         }
                     })
                 }
         }
-        res.send(resMsg)
+        
     }
     vote();
 })
@@ -137,6 +149,7 @@ const querys = function(str){
             if(err){
                 resolve(false)
             }else{
+                console.log(rows);
                 var datas = rows != null ? rows : false;
                 resolve(datas)
             }
