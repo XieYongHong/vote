@@ -52,7 +52,8 @@ router.post('/vote',(req,res) => {
                     let ipUUID = ipType[0].sha
                     if(vTime2 == nTime){
                         var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:voteDate})
+                        	console.log(voteDate)
+			resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:voteDate})
                     }else{
                         await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
                             if(err){
@@ -62,6 +63,7 @@ router.post('/vote',(req,res) => {
                                 var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                                 if(up){
                                     var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
+					console.log(voteDate)
                                     resMsg = comm.reMsg(true,'投票成功',{vote:voteDate})
                                 }
                             }
