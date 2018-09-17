@@ -49,7 +49,7 @@ router.post('/edit',(req ,res) => { //编辑
 
 router.get('/list/:type',(req,res) => {
     const type = req.params.type
-    mysql.query(`select a.id,a.name,a.author,a.create_time,a.img_url,a.content,a.text,b.click,b.vote from BOOK as a,VOTE as b where state=0 and type=${type} and a.id=b.book_id`,(data,err) => {
+    mysql.query(`select a.id,a.name,a.author,a.create_time,a.img_url,a.content,a.text,b.click,b.vote from BOOK as a,VOTE as b where state=0 and type=${type} and a.id=b.book_id ORDER BY a.create_time DESC`,(data,err) => {
         let resMsg = {}
         if(err){
             resMsg = comm.reMsg(false,'查询失败',null)
@@ -74,7 +74,7 @@ router.get('/info/:id',(req,res) => {
 })
 
 router.get('/getAll', (req,res) => {
-    mysql.query('select id,name,author,submission_time,img_url,content,type from BOOK',(data,err) => {
+    mysql.query('select id,name,author,submission_time,img_url,content,type from BOOK ORDER BY create_time DESC',(data,err) => {
         let resMsg = {}
         if(err){
             resMsg = comm.reMsg(false,'查询失败',null)
