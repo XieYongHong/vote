@@ -7,8 +7,8 @@ const comm = require('../utils/common.js')
 router.post('/add',(req ,res) => {//增加短文
     const data = req.body;
     const nowTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
-    mysql.query(`insert into BOOK (name,author,state,create_time,submission_time,content,img_url,type) 
-            values ('${data.name}','${data.author}',0,'${nowTime}','${data.time}','${data.content}','${data.img}',${data.type})`, (row,err) => {
+    mysql.query(`insert into BOOK (name,author,state,create_time,submission_time,content,img_url,type,text) 
+            values ('${data.name}','${data.author}',0,'${nowTime}','${data.time}','${data.content}','${data.img}',${data.type},${text})`, (row,err) => {
                 let resMsg = {}
                 if(err){
                     resMsg = comm.reMsg(false,'保存失败',null)
@@ -36,7 +36,7 @@ router.post('/edit',(req ,res) => { //编辑
     const data = req.body;
     const nowTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
     mysql.query(`update BOOK set name='${data.name}',author='${data.author}',update_time='${nowTime}'
-                ,submission_time='${data.time}',img_url='${data.img}',type=${data.type},content='${data.content}' where id='${data.id}'`,(data,err) => {
+                ,submission_time='${data.time}',img_url='${data.img}',type=${data.type},content='${data.content}',text='${data.text}' where id='${data.id}'`,(data,err) => {
                 let resMsg = {}
                 if(err){
                     resMsg = comm.reMsg(false,'修改失败',null)
