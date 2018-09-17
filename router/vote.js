@@ -31,10 +31,10 @@ router.post('/vote',(req,res) => {
                             resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
                         }else{
                             const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
-                            var up = querys(`update IP set updateTime=${time} where sha=${data.session}`)
+                            var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                             if(up){
                                 var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                                resMsg = comm.reMsg(true,'投票成功',voteDate)
+                                resMsg = comm.reMsg(true,'投票成功',{vote:voteDate[0].vote})
                             }
                         }
                     })
@@ -60,7 +60,7 @@ router.post('/vote',(req,res) => {
                                 var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                                 if(up){
                                     var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                                    resMsg = comm.reMsg(true,'投票成功',voteDate)
+                                    resMsg = comm.reMsg(true,'投票成功',{vote:voteDate[0].vote})
                                 }
                             }
                         })
@@ -77,7 +77,7 @@ router.post('/vote',(req,res) => {
                             var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
                             if(up){
                                 var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                                resMsg = comm.reMsg(true,'投票成功',voteDate)
+                                resMsg = comm.reMsg(true,'投票成功',{vote:voteDate[0].vote,session:ipUUID})
                             }
                         }
                     })
