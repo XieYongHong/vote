@@ -19,7 +19,7 @@ router.post('/vote',(req,res) => {
         let sessionType
         let resMsg = {}
         if(data.session){//验证session
-            sessionType = await querys(`select ip,sha,update_time from IP wehere sha='${data.session}'`)
+            sessionType = await querys(`select ip,sha,update_time from IP where sha='${data.session}'`)
             if(sessionType){
                 //验证投票时间
                 let vTime = sessionType[0].update_time.substring(0,10)
@@ -27,7 +27,7 @@ router.post('/vote',(req,res) => {
                 if(vTime == nTime){
                     resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',null)
                 }else{
-                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 wehere book_id='${id}'`,(data,err) => {
+                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id='${id}'`,(data,err) => {
                         if(err){
                             resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
                         }else{
@@ -44,14 +44,14 @@ router.post('/vote',(req,res) => {
                 resMsg = comm.reMsg(false,'投票失败,请联系墙君 code:010',null)
             }
         }else{
-            var ipType = await querys(`select ip,sha,update_time from IP wehere ip='${ip}'`)
+            var ipType = await querys(`select ip,sha,update_time from IP where ip='${ip}'`)
                 if(ipType){
                     let vTime = ipType[0].update_time.substring(0,10)
                     let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
                     if(vTime == nTime){
                         resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',null)
                     }else{
-                        await mysql.query(`update VOTE set vote=vote+1,click=click+1 wehere book_id=${id}`,(data,err) => {
+                        await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${id}`,(data,err) => {
                             if(err){
                                 resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
                             }else{
@@ -65,7 +65,7 @@ router.post('/vote',(req,res) => {
                         })
                     }
                 }else{//第一次投票
-                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 wehere book_id=${id}`,(data,err) => {
+                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${id}`,(data,err) => {
                         if(err){
                             resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
                         }else{
