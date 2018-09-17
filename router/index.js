@@ -8,7 +8,7 @@ router.post('/add',(req ,res) => {//增加短文
     const data = req.body;
     const nowTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
     mysql.query(`insert into BOOK (name,author,state,create_time,submission_time,content,img_url,type,text) 
-            values ('${data.name}','${data.author}',0,'${nowTime}','${data.time}','${data.content}','/images/${data.img}',${data.type},${data.text})`, (row,err) => {
+            values ('${data.name}','${data.author}',0,'${nowTime}','${data.time}','${data.content}','/images/${data.img}',${data.type},'${data.text}')`, (row,err) => {
                 let resMsg = {}
                 if(err){
                     resMsg = comm.reMsg(false,'保存失败',null)
