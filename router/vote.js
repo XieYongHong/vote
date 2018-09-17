@@ -15,11 +15,8 @@ router.post('/vote',(req,res) => {
         if(ip.split(':').length>0){
             ip = ip.split(':')[3]
         }
-        console.log(ip);
-        ip = '192.168.9.11'
         let sessionType
         let resMsg = {}
-        console.log(data.session);
         if(data.session){//验证session
             sessionType = await querys(`select ip,sha,update_time from IP where sha='${data.session}'`)
             if(sessionType.length){
@@ -47,11 +44,12 @@ router.post('/vote',(req,res) => {
             }
         }else{
             var ipType = await querys(`select ip,sha,update_time from IP where ip='${ip}'`)
-            console.log(ipType);
                 if(ipType.length){
-                    let vTime = ipType[0].update_time
+                    let vTime = ipType[0].update_time.toString()
                     let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
-                    if(vTime.substring(0,10) == nTime){
+                    let vTime2 = SDT.format(new Date(vTime),'YYYY-MM-DD HH:mm:ss').substring(0,10)
+                    let ipUUID = ipType[0].sha
+                    if(vTime2 == nTime){
                         resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',null)
                     }else{
                         await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
