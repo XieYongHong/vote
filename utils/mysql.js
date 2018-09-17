@@ -13,7 +13,7 @@ let query = (sql,callback) =>{
         }else{
             console.log(sql);
             connection.query(sql,(err,rows) => {
-                callback(rows)
+                callback(rows,err)
                 console.log(err);
                 connection.release();
             })
