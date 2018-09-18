@@ -19,7 +19,7 @@ router.post('/vote',async (req,res) => {
             resMsg = comm.reMsg(false,'活动已结束，请期待下次活动。',null)
             res.send(resMsg)
         }
-        const ipData = await querys(`select ip,sha,update_time from IP where book_id='${data.id}' and update_time like '${nTime}%' and ip='${ip}'`)
+        const ipData = await querys(`select * from IP where book_id='${data.id}' and update_time like '${nTime}%' and ip='${ip}'`)
         if(ipData.length){//今天已经投过票
             const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
             var num = voteData[0].vote
