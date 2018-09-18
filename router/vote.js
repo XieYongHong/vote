@@ -13,12 +13,13 @@ router.post('/vote',async (req,res) => {
             ip = ip.split(':')[3]
         }
         let resMsg = {}
-        const nTime = SDT.format(new Date(),'YYYY-MM-DD')
+        const nTime = SDT.format(new Date(),'YYYY-MM-DD HH-mm-ss')
+        const nTIme2 = nTime.substr(0,10)
         if(Date.parse( new Date()) >= END_TIME){
             resMsg = comm.reMsg(false,'活动已结束，请期待下次活动。',null)
             res.send(resMsg)
         }
-        const ipData = await querys(`select ip,sha,update_time from IP where book_id='${data.id}' and update_time like '${nTime}%' and ip='${ip}'`)
+        const ipData = await querys(`select ip,sha,update_time from IP where book_id='${data.id}' and update_time like '${nTIme2}%' and ip='${ip}'`)
         if(ipData.length){//今天已经投过票
             const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
             var num = voteData[0].vote
