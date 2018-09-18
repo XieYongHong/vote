@@ -22,7 +22,7 @@ router.post('/vote',async (req,res) => {
         if(ipData.length){//今天已经投过票
             const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
             var num = voteData[0].vote
-            resMsg = comm.reMsg(true,'今天您为此篇文章已投过票，是否返回首页，查看更多精彩文章。',{vote:num})
+            resMsg = comm.reMsg(true,'今天您为此篇文章已投过票，是否返回首页，查看更多精彩文章。',{vote:num,code:203})
             res.send(resMsg)
         }else{  
             const vote = await querys(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`)
@@ -30,7 +30,7 @@ router.post('/vote',async (req,res) => {
                 await querys(`insert into IP (ip,update_time,book_id) values ('${ip}','${nTime}','${data.id}')`)
                 const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
                 var num = voteData[0].vote
-                resMsg = comm.reMsg(true,'投票成功，想看更多精彩文章，请返回首页。',{vote:num})
+                resMsg = comm.reMsg(true,'投票成功，想看更多精彩文章，请返回首页。',{vote:num,code:200})
                 res.send(resMsg)
             }else{
                 resMsg = comm.reMsg(false,'投票失败,请联系墙君！',null)
