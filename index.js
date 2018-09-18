@@ -1,13 +1,10 @@
 const express = require('express')
 const app = express()
-const qs = require('querystring')
 
 const PORT = 8083 //端口号
-const END_TIME = '2018-10-06 08:00:00' //结束时间
 const book = require('./router/index')
 const vote = require('./router/vote')
 const bodyParser = require('body-parser')
-
 
 app.disable('x-powered-by')
 
@@ -34,16 +31,3 @@ app.use('/vote',vote)
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
 })
-
-//获取header中是否有Authorization
-const getAuthorization = (req,res,next) => {
-    const aut = req.get('Authorization')
-    console.log(aut);
-    if(aut){
-        next()
-    }else{
-        res.send({
-            data:'没有Authorization'
-        })
-    }
-}

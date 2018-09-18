@@ -3,10 +3,7 @@ const router = express.Router()
 const mysql = require('../utils/mysql.js')
 const SDT = require('silly-datetime')
 const comm = require('../utils/common.js')
-const uuid = require('node-uuid')
-const sha256 = require('js-sha256')
-
-
+const END_TIME = Date.parse( new Date('2018-10-13 22:00:00' ));//结束时间
 router.post('/vote',async (req,res) => {
         const data = req.body
         var ip = req.headers['x-real-ip'] ||
@@ -17,6 +14,10 @@ router.post('/vote',async (req,res) => {
         }
         let resMsg = {}
         const nTime = SDT.format(new Date(),'YYYY-MM-DD')
+        if(Date.parse( new Date()) >= END_TIME){
+            resMsg = comm.reMsg(false,'活动已结束，请期待下次活动。',null)
+            res.send(resMsg)
+        }
         const ipData = await querys(`select ip,sha,update_time from IP where book_id='${data.id}' and update_time like '${nTime}%' and ip='${ip}'`)
         if(ipData.length){//今天已经投过票
             const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
