@@ -7,6 +7,10 @@ const pool = mysql.createPool({
 })
 
 let query = (sql,callback) =>{
+    return new Promise((resolve,reject) => {
+
+    })
+
     pool.getConnection((err,connection) => {
         if(err){
             console.log(err);
