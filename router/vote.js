@@ -26,7 +26,7 @@ router.post('/vote',async (req,res) => {
         }else{  
             const vote = await querys(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`)
             if(vote){
-                await querys(`insert into IP (ip,update_time) values ('${ip}','${nTime}')`)
+                await querys(`insert into IP (ip,update_time,book_id) values ('${ip}','${nTime}','${data.id}')`)
                 const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
                 var num = voteData[0].vote
                 resMsg = comm.reMsg(true,'投票成功！',{vote:num})
