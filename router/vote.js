@@ -131,7 +131,7 @@ router.get('/query/:id', (req,res) => {
 router.get('/getRank/:type',(req,res) => {
     const type = req.params.type
     const rank = async () => {
-        const click = await querys(`select a.click,a.vote,b.id,b.name,b.id,b.author,b.img_url from VOTE as a, BOOK as b where b.type='${type}' and b.state=0 ORDER BY a.click desc limit 0, 5`)
+        const click = await querys(`select a.click,a.vote,b.id,b.name,b.id,b.author,b.img_url from VOTE as a, BOOK as b where b.type='${type}' and b.state=0 and b.id=a.book_id ORDER BY a.click desc limit 0, 5`)
         const vote = await querys(`select a.vote,b.name,b.id,b.author,b.img_url from VOTE as a, BOOK as b where b.type='${type}' and b.id=a.book_id and b.state=0 ORDER BY a.vote desc limit 0, 12`)
         let resMsg = {}
         if(!click && !Vote){
