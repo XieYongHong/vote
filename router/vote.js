@@ -18,7 +18,7 @@ router.post('/vote',async (req,res) => {
         let resMsg = {}
         const nTime = SDT.format(new Date(),'YYYY-MM-DD')
         const ipData = await querys(`select ip,sha,update_time from IP where book_id='${data.id}' and update_time like '${nTime}%' and ip='${ip}'`)
-        if(ipData){//今天已经投过票
+        if(ipData.length){//今天已经投过票
             const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
             var num = voteData[0].vote
             resMsg = comm.reMsg(true,'投票失败,今天已经投过票了！',{vote:num})
@@ -26,7 +26,7 @@ router.post('/vote',async (req,res) => {
         }else{  
             const vote = await querys(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`)
             if(vote){
-                await querys(`insert into IP (ip,update_time) values ('${ip}','${time}')`)
+                await querys(`insert into IP (ip,update_time) values ('${ip}','${nTime}')`)
                 const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
                 var num = voteData[0].vote
                 resMsg = comm.reMsg(true,'投票成功！',{vote:num})
