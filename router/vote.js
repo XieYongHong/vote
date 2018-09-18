@@ -6,8 +6,8 @@ const comm = require('../utils/common.js')
 const uuid = require('node-uuid')
 const sha256 = require('js-sha256')
 
-router.post('/vote',(req,res) => {
-    const vote = async () => {
+
+router.post('/vote',async (req,res) => {
         const data = req.body
         var ip = req.headers['x-real-ip'] ||
         req.headers['x-forwarded-for'] ||
@@ -15,93 +15,27 @@ router.post('/vote',(req,res) => {
         if(ip.split(':').length>0){
             ip = ip.split(':')[3]
         }
-        
-        let sessionType
         let resMsg = {}
-        if(data.session){//验证session
-            sessionType = await querys(`select ip,sha,update_time from IP where sha='${data.session}'`)
-            if(sessionType.length){
-                //验证投票时间
-                let vTime = sessionType[0].update_time.substring(0,10)
-                let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
-                if(vTime == nTime){
-                    await mysql.query(`select vote from VOTE where book_id=${data.id}`,(data,err) => {
-                        var num = data[0].vote
-                        resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:num})
-                        res.send(resMsg)
-                    })
-                }else{
-                    mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id='${id}'`,(data,err) => {
-                        if(err){
-                            resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
-                            res.send(resMsg)
-                        }else{
-                            const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
-                            var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
-                            if(up){
-                                var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                                resMsg = comm.reMsg(true,'投票成功',{vote:voteDate})
-                                res.send(resMsg)
-                            }
-                        }
-                    })
-                }
+        const nTime = SDT.format(new Date(),'YYYY-MM-DD')
+        const ipData = await querys(`select ip,sha,update_time from IP where book_id='${data.id}' and update_time like '${nTime}%' and ip='${ip}'`)
+        if(ipData){//今天已经投过票
+            const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
+            var num = voteData[0].vote
+            resMsg = comm.reMsg(true,'投票失败,今天已经投过票了！',{vote:num})
+            res.send(resMsg)
+        }else{  
+            const vote = await querys(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`)
+            if(vote){
+                await querys(`insert into IP (ip,update_time) values ('${ip}','${time}')`)
+                const voteData = await querys(`select vote from VOTE where book_id=${data.id}`)
+                var num = voteData[0].vote
+                resMsg = comm.reMsg(true,'投票成功！',{vote:num})
+                res.send(resMsg)
             }else{
-                resMsg = comm.reMsg(false,'投票失败,请联系墙君 code:010',null)
+                resMsg = comm.reMsg(true,'投票失败,请联系墙君！',null)
                 res.send(resMsg)
             }
-        }else{
-            var ipType = await querys(`select ip,sha,update_time from IP where ip='${ip}'`)
-                if(ipType.length){
-                    let vTime = ipType[0].update_time.toString()
-                    let nTime = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss').substring(0,10)
-                    let vTime2 = SDT.format(new Date(vTime),'YYYY-MM-DD HH:mm:ss').substring(0,10)
-                    let ipUUID = ipType[0].sha
-                    if(vTime2 == nTime){
-                        mysql.query(`select vote from VOTE where book_id=${data.id}`,(data,err) => {
-                            var num = data[0].vote
-                            resMsg = comm.reMsg(true,'投票失败,今天已经投过票了',{vote:num})
-                            res.send(resMsg)
-                        })
-                    }else{
-                        await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
-                            if(err){
-                                resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
-                                res.send(resMsg)
-                            }else{
-                                const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
-                                var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
-                                if(up){
-                                    var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                                    resMsg = comm.reMsg(true,'投票成功',{vote:voteDate})
-                                    res.send(resMsg)
-                                }
-                            }
-                        })
-                    }
-                }else{//第一次投票
-                    await mysql.query(`update VOTE set vote=vote+1,click=click+1 where book_id=${data.id}`,(data,err) => {
-                        if(err){
-                            resMsg = comm.reMsg(false,'投票失败,请联系墙君',null)
-                            res.send(resMsg)
-                        }else{
-                            const time = SDT.format(new Date(),'YYYY-MM-DD HH:mm:ss')
-                            const uuids = uuid.v4()
-                            const sUUID = sha256.sha256(uuids)
-                            const ipUUID = sha256.sha256(sUUID+ip)
-                            var up = querys(`insert into IP (ip,sha,create_time,update_time) values ('${ip}','${ipUUID}','${time}','${time}')`)
-                            if(up){
-                                var voteDate = querys(`select vote from VOTE where book_id=${data.id}`)
-                                resMsg = comm.reMsg(true,'投票成功',{vote:voteDate,session:ipUUID})
-                                res.send(resMsg)
-                            }
-                        }
-                    })
-                }
         }
-        
-    }
-    vote();
 })
 router.get('/click/:id', (req,res) => {
     const id = req.params.id
