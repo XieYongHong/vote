@@ -74,7 +74,7 @@ router.get('/info/:id',(req,res) => {
 })
 
 router.get('/getAll', (req,res) => {
-    mysql.query('select id,name,author,submission_time,img_url,content,type from BOOK ORDER BY create_time DESC',(data,err) => {
+    mysql.query('select id,name,author,submission_time,img_url,content,type,state from BOOK ORDER BY create_time DESC',(data,err) => {
         let resMsg = {}
         if(err){
             resMsg = comm.reMsg(false,'查询失败',null)
